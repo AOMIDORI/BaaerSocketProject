@@ -159,6 +159,7 @@ int __cdecl main(int argc, char **argv)
 			WSACleanup();
 			return 1;
 		}
+		//Log out---------------------------------------------------------------
 		if(choice=='7'){
 			cout<<"Log out. Bye."<<endl;
 			// shutdown the connection since no more data will be sent
@@ -170,9 +171,36 @@ int __cdecl main(int argc, char **argv)
 				return 1;
 			}
 			return 0;
-		}	
+		}
+		//Send a Message-----------------------------------------------------------
+		else if(choice=='1'){ 
+			cout<<"Please type in your Message: "<<endl;
+			string s;
+			cin>>s;
+			sendbuf=(char*)s.c_str();
+			if(send(ConnectSocket,sendbuf,(int)strlen(sendbuf),0)==SOCKET_ERROR){
+				printf("send failed with error: %d\n", WSAGetLastError());
+				closesocket(ConnectSocket);
+				WSACleanup();
+				return 1;
+			}
+		}
 	}
 
+    //printf("Bytes Sent: %ld\n", iResult);
+
+    
+
+    // Receive until the peer closes the connection
+
+	// shutdown the connection since no more data will be sent
+   /* iResult = shutdown(ConnectSocket, SD_SEND);
+    if (iResult == SOCKET_ERROR) {
+        printf("shutdown failed with error: %d\n", WSAGetLastError());
+        closesocket(ConnectSocket);
+        WSACleanup();
+        return 1;
+    }*/
 
     // cleanup
 
