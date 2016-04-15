@@ -23,8 +23,9 @@ using namespace std;
 #define DEFAULT_PORT "27015"
 
 int g_usercount=0;
-vector<User> g_userlist;
+
 vector<string> g_namelist;
+vector<User> g_userlist;
 
 int iResult;
 int iSendResult;
@@ -134,85 +135,91 @@ void connection_handler(){
 			WSACleanup();
 			exit(1);
 		}
+	    int userID; 
+		//Send the welcome info to the user, ask for the username.---------------------
+		sendbuf="Hello client! Please type in your username:";
+		if(send(ClientSocket, sendbuf, (int)strlen(sendbuf),0)==SOCKET_ERROR){
+			printf("send failed with error: %d\n", WSAGetLastError());
+			closesocket(ClientSocket);
+			WSACleanup();
+			exit(1);
+		}
 
-		// Receive until the peer shuts down the connection
-		do {
-			//Send the welcome info to the user, ask for the username.---------------------
-			sendbuf="Hello client! Please type in your username:";
-			if(send(ClientSocket, sendbuf, (int)strlen(sendbuf),0)==SOCKET_ERROR){
-				printf("send failed with error: %d\n", WSAGetLastError());
-				closesocket(ClientSocket);
-				WSACleanup();
-				exit(1);
+		//Receive the username from the client------------------------------------------
+		iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
+		if (iResult > 0) {
+			recvbuf[iResult]='\0';
+			string username(recvbuf);
+			cout<<"Name received: ["<<username<<"], checking..."<<endl;
+			if(find(g_namelist.begin(),g_namelist.end(),username)!=g_namelist.end()){
+				cout<<"The user exists."<<endl;
 			}
-
-			//Receive the username from the client------------------------------------------
-			iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
-			if (iResult > 0) {
-				recvbuf[iResult]='\0';
-				string username(recvbuf);
-				cout<<"Name received: ["<<username<<"], checking..."<<endl;
-				if(find(g_namelist.begin(),g_namelist.end(),username)!=g_namelist.end()){
-					cout<<"The user exists."<<endl;
+			else{
+				g_namelist.push_back(username);
+				cout<<"New user ["<<username<<"] is registered."<<endl;
+				User u;
+				u.name=(char *)malloc(username.length()+1);
+				int i;
+				for(i=0;username[i]!='\0';i++){
+					u.name[i]=username[i];
 				}
-				else{
-					g_namelist.push_back(username);
-					cout<<"New user ["<<username<<"] is registered."<<endl;
-					User u;
-					u.name=(char *)malloc(username.length()+1);
-					int i;
-					for(i=0;username[i]!='\0';i++){
-						u.name[i]=username[i];
-					}
-					u.name[i]='\0';
-					u.status=0;
-					g_userlist.push_back(u);
-				}
-				//check if the user is taken
-				bool usertaken=FALSE;
-				int userID;
-				for(userID=0;userID<g_userlist.size();userID++){
-					if(username.compare(g_userlist[userID].name)==0){		
-						if(g_userlist[userID].status==1){
-							usertaken=TRUE;
-							cout<<"The user is already being used by another client;"<<endl;
-						    break;
-						}	
+				u.name[i]='\0';
+				u.status=0;
+				g_userlist.push_back(u);
+			}
+			//check if the user is taken
+			bool usertaken=FALSE;
+			for(userID=0;userID<g_userlist.size();userID++){
+				if(username.compare(g_userlist[userID].name)==0){		
+					if(g_userlist[userID].status==1){
+						usertaken=TRUE;
+						cout<<"Log in declined."<<endl;
 						break;
-					}
+					}	
+					break;
 				}
-				//send the login result to the user.
-				if(!usertaken){
-					g_userlist[userID].status=1;
-					sendbuf="00"; //The user can log in
-					if(send(ClientSocket, sendbuf, (int)strlen(sendbuf),0)==SOCKET_ERROR){
-						printf("send failed with error: %d\n", WSAGetLastError());
-						closesocket(ClientSocket);
-						WSACleanup();
-						exit(1);
-					}
-					
-				}
-				else{
-					sendbuf="01"; //The user can't log in
-					if(send(ClientSocket, sendbuf, (int)strlen(sendbuf),0)==SOCKET_ERROR){
-						printf("send failed with error: %d\n", WSAGetLastError());
-						closesocket(ClientSocket);
-						WSACleanup();
-						exit(1);
-					}
-				}			
 			}
-			else if (iResult == 0)
-				printf("Connection closing...\n");
-			//else  {
-				//printf("recv failed with error: %d\n", WSAGetLastError());
-				//closesocket(ClientSocket);
-				//WSACleanup();
-				//exit(1);
-			//}
+			//send the login result to the user.
+			if(!usertaken){
+				g_userlist[userID].status=1;
+				sendbuf="00"; //The user can log in
+				if(send(ClientSocket, sendbuf, (int)strlen(sendbuf),0)==SOCKET_ERROR){
+					printf("send failed with error: %d\n", WSAGetLastError());
+					closesocket(ClientSocket);
+					WSACleanup();
+					exit(1);
+				}
 
-		} while (iResult > 0);
+			}
+			else{
+				sendbuf="01"; //The user can't log in
+				if(send(ClientSocket, sendbuf, (int)strlen(sendbuf),0)==SOCKET_ERROR){
+					printf("send failed with error: %d\n", WSAGetLastError());
+					closesocket(ClientSocket);
+					WSACleanup();
+					exit(1);
+				}
+				///break;
+			}
+		}
+		else if (iResult == 0)
+			printf("Connection closing...\n");
+		//else  {
+		//printf("recv failed with error: %d\n", WSAGetLastError());
+		//closesocket(ClientSocket);
+		//WSACleanup();
+		//exit(1);
+		//}
+
+		//Receive menu choice from client ------------------------------------------
+		if(recv(ClientSocket,recvbuf,recvbuflen,0)>0){
+			if(recvbuf[0]=='7'){ //log out
+				g_userlist[userID].status=0;				
+			}
+			else if(recvbuf[0]=='1'){ //send a message
+			}
+		}
+
 
 		 //shutdown the connection since we're done
 		/*iResult = shutdown(ClientSocket, SD_SEND);
