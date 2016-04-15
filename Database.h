@@ -13,4 +13,9 @@ typedef struct{
 }User;
 
 
+void message_handler(int option){
+
+}
+//void follow_handler(int option){}
+//void print_timeline(char *username){}
 #endif
