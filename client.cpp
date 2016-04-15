@@ -150,7 +150,7 @@ int __cdecl main(int argc, char **argv)
 		cout<<"-------------------------------------------------"<<endl;
 
 		char choice;
-		cout<<"Your choice number: ";
+		//cout<<"Your choice number: ";
 		cin>>choice;
 		sendbuf[0]=choice;
 		if(send(ConnectSocket,sendbuf,(int)strlen(sendbuf),0)==SOCKET_ERROR){
@@ -176,7 +176,8 @@ int __cdecl main(int argc, char **argv)
 		else if(choice=='1'){ 
 			cout<<"Please type in your Message: "<<endl;
 			string s;
-			cin>>s;
+			getchar();
+			getline(cin,s);
 			sendbuf=(char*)s.c_str();
 			if(send(ConnectSocket,sendbuf,(int)strlen(sendbuf),0)==SOCKET_ERROR){
 				printf("send failed with error: %d\n", WSAGetLastError());
