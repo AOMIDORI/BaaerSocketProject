@@ -22,10 +22,13 @@ using namespace std;
 #define DEFAULT_BUFLEN 512
 #define DEFAULT_PORT "27015"
 
+//.......Global variables.................
 int g_usercount=0;
+int g_messagecount=0;
 
 vector<string> g_namelist;
 vector<User> g_userlist;
+//vector<Message> g_messagelist;
 
 int iResult;
 int iSendResult;
@@ -33,7 +36,11 @@ int iSendResult;
 SOCKET ListenSocket = INVALID_SOCKET;
 SOCKET ClientSocket = INVALID_SOCKET;
 
+//.......functions predeclaration..........
 void connection_handler(void);
+void message_handler(int, int);
+void print_timeline(int);
+
 
 int __cdecl main(void) 
 {
@@ -127,7 +134,7 @@ void connection_handler(){
 	char *sendbuf=NULL;
     char recvbuf[DEFAULT_BUFLEN];
     int recvbuflen = DEFAULT_BUFLEN;
-	int iflogin;
+	bool iflogin=FALSE;
 	
 	if (ClientSocket == INVALID_SOCKET) {
 			printf("accept failed with error: %d\n", WSAGetLastError());
@@ -183,6 +190,7 @@ void connection_handler(){
 			if(!usertaken){
 				g_userlist[userID].status=1;
 				sendbuf="00"; //The user can log in
+				iflogin=TRUE;
 				if(send(ClientSocket, sendbuf, (int)strlen(sendbuf),0)==SOCKET_ERROR){
 					printf("send failed with error: %d\n", WSAGetLastError());
 					closesocket(ClientSocket);
@@ -212,11 +220,21 @@ void connection_handler(){
 		//}
 
 		//Receive menu choice from client ------------------------------------------
-		if(recv(ClientSocket,recvbuf,recvbuflen,0)>0){
-			if(recvbuf[0]=='7'){ //log out
-				g_userlist[userID].status=0;				
-			}
-			else if(recvbuf[0]=='1'){ //send a message
+		while(iflogin){
+			if(recv(ClientSocket,recvbuf,recvbuflen,0)>0){
+				cout<<"choice from client"<<recvbuf[0]<<endl;
+				if(recvbuf[0]=='7'){ //log out
+					g_userlist[userID].status=0;	
+					iflogin=FALSE;
+					break;
+				}
+				else if(recvbuf[0]=='1'){ //send a message
+					message_handler(0,userID);
+				}
+				else if(recvbuf[0]=='3'){
+					cout<<"Printing the user timeline:"<<endl;
+					print_timeline(userID);
+				}
 			}
 		}
 
@@ -230,4 +248,36 @@ void connection_handler(){
 			exit(1);
 		}*/
 		closesocket(ClientSocket);
+}
+
+/////////////////////////////////////////////////////////////////////////////////
+void message_handler(int option, int userID){
+	char recvbuf[DEFAULT_BUFLEN];
+    int recvbuflen = DEFAULT_BUFLEN;
+	if(option==0){ //send a message
+		iResult=recv(ClientSocket,recvbuf,recvbuflen,0);
+		if(iResult>0){
+			recvbuf[iResult]='\0';
+			g_messagecount++;  //to generate the ID
+			struct Message m;
+			m.messageID=g_messagecount;
+			m.text=(char*)malloc(iResult);
+			strcpy(m.text,recvbuf);
+			m.publishtime=NULL;
+			//time_t rawtime;
+			//m.publishtime=localtime(&rawtime);
+			//printf("%s\n",asctime(m.publishtime));
+			g_userlist[userID].messagelist.push_back(m);
+		}
+	}
+	if(option==1){ //Delete a message
+		
+	}
+}
+
+void print_timeline(int userID){
+	int i;
+	for(i=0;i<(int)g_userlist[userID].messagelist.size();i++){
+		cout<<g_userlist[userID].messagelist[i].text<<endl;
+	}
 }
