@@ -159,7 +159,7 @@ void connection_handler(){
 			string username(recvbuf);
 			cout<<"Name received: ["<<username<<"], checking..."<<endl;
 			if(find(g_namelist.begin(),g_namelist.end(),username)!=g_namelist.end()){
-				cout<<"The user exists."<<endl;
+				//cout<<"The user exists."<<endl;
 			}
 			else{
 				g_namelist.push_back(username);
@@ -197,6 +197,7 @@ void connection_handler(){
 					WSACleanup();
 					exit(1);
 				}
+				cout<<"["<<g_userlist[userID].name<<"] log in"<<endl;
 
 			}
 			else{
@@ -218,26 +219,27 @@ void connection_handler(){
 		//WSACleanup();
 		//exit(1);
 		//}
-
+		
 		//Receive menu choice from client ------------------------------------------
 		while(iflogin){
 			if(recv(ClientSocket,recvbuf,recvbuflen,0)>0){
-				cout<<"choice from client"<<recvbuf[0]<<endl;
+				//cout<<"Choice from client: "<<recvbuf[0]<<endl;
 				if(recvbuf[0]=='7'){ //log out
-					g_userlist[userID].status=0;	
+					g_userlist[userID].status=0;
+					cout<<"["<<g_userlist[userID].name<<"] log out."<<endl;
 					iflogin=FALSE;
-					break;
 				}
 				else if(recvbuf[0]=='1'){ //send a message
+					cout<<"["<<g_userlist[userID].name<<"] send a message."<<endl;
 					message_handler(0,userID);
 				}
 				else if(recvbuf[0]=='3'){
-					cout<<"Printing the user timeline:"<<endl;
+					cout<<"Printing ["<<g_userlist[userID].name<<"]'s timeline:"<<endl;
 					print_timeline(userID);
 				}
 			}
 		}
-
+		g_userlist[userID].status=0;
 
 		 //shutdown the connection since we're done
 		/*iResult = shutdown(ClientSocket, SD_SEND);
