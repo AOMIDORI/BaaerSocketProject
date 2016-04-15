@@ -137,24 +137,42 @@ int __cdecl main(int argc, char **argv)
 	}
 
 	//Main menu--------------------------------------------------------------------
-	while(ifconnect){
 
+	while(ifconnect){
+		cout<<"==================Main menu====================="<<endl;
+		cout<<"1. Send a message."<<endl;
+		cout<<"2. Delete a message."<<endl;
+		cout<<"3. Print user timeline."<<endl;
+		cout<<"4. Print timeline of friends."<<endl;
+		cout<<"5. Follow someone."<<endl;
+		cout<<"6. Unfollow someone."<<endl;
+		cout<<"7. Log out." <<endl;
+		cout<<"-------------------------------------------------"<<endl;
+
+		char choice;
+		cout<<"Your choice number: ";
+		cin>>choice;
+		sendbuf[0]=choice;
+		if(send(ConnectSocket,sendbuf,(int)strlen(sendbuf),0)==SOCKET_ERROR){
+			printf("send failed with error: %d\n", WSAGetLastError());
+			closesocket(ConnectSocket);
+			WSACleanup();
+			return 1;
+		}
+		if(choice=='7'){
+			cout<<"Log out. Bye."<<endl;
+			// shutdown the connection since no more data will be sent
+			iResult = shutdown(ConnectSocket, SD_SEND);
+			if (iResult == SOCKET_ERROR) {
+				printf("shutdown failed with error: %d\n", WSAGetLastError());
+				closesocket(ConnectSocket);
+				WSACleanup();
+				return 1;
+			}
+			return 0;
+		}	
 	}
 
-    //printf("Bytes Sent: %ld\n", iResult);
-
-    
-
-    // Receive until the peer closes the connection
-
-	// shutdown the connection since no more data will be sent
-   /* iResult = shutdown(ConnectSocket, SD_SEND);
-    if (iResult == SOCKET_ERROR) {
-        printf("shutdown failed with error: %d\n", WSAGetLastError());
-        closesocket(ConnectSocket);
-        WSACleanup();
-        return 1;
-    }*/
 
     // cleanup
 
@@ -164,5 +182,3 @@ int __cdecl main(int argc, char **argv)
 	getchar();
     return 0;
 }
-
-
