@@ -90,32 +90,14 @@ int __cdecl main(int argc, char **argv)
         return 1;
     }
 
-	//Receive welcome from the server---------------------------------------
-	iResult=recv(ConnectSocket,recvbuf,recvbuflen,0);
-	if (iResult == SOCKET_ERROR) {
-        printf("send failed with error: %d\n", WSAGetLastError());
-        closesocket(ConnectSocket);
-        WSACleanup();
-        return 1;
-    }
-	else if(iResult==0)
-		printf("Connection closing...\n");
-	else{
-		cout<<"Server: ";
-		int i;
-		for(i=0;i<=iResult;i++){
-			cout<<recvbuf[i];
-		}
-		cout<<endl;
-	}
-
     // Send the username------------------------------------------------------
+	cout<<"Hello, welcome. Your username?"<<endl;
 	string username;
 	cin>>username;
 
 	sendbuf=(char*)username.c_str();
 	
-	iResult = send(ConnectSocket, sendbuf, (int)strlen(sendbuf), 0 );
+	iResult = send(ConnectSocket, sendbuf, (int)strlen(sendbuf)+1, 0 );
     if (iResult == SOCKET_ERROR) {
         printf("send failed with error: %d\n", WSAGetLastError());
         closesocket(ConnectSocket);
@@ -150,17 +132,18 @@ int __cdecl main(int argc, char **argv)
 		cout<<"-------------------------------------------------"<<endl;
 
 		char choice;
-		//cout<<"Your choice number: ";
+		cout<<"Your choice number: ";
 		cin>>choice;
 		sendbuf[0]=choice;
-		if(send(ConnectSocket,sendbuf,(int)strlen(sendbuf),0)==SOCKET_ERROR){
+		if(send(ConnectSocket,sendbuf,(int)strlen(sendbuf)+1,0)==SOCKET_ERROR){
 			printf("send failed with error: %d\n", WSAGetLastError());
 			closesocket(ConnectSocket);
 			WSACleanup();
 			return 1;
 		}
-		//Log out---------------------------------------------------------------
-		if(choice=='7'){
+		string s;
+		switch (choice){
+		case '7'://Log out----------------------------------------------------------
 			cout<<"Log out. Bye."<<endl;
 			// shutdown the connection since no more data will be sent
 			iResult = shutdown(ConnectSocket, SD_SEND);
@@ -171,37 +154,53 @@ int __cdecl main(int argc, char **argv)
 				return 1;
 			}
 			return 0;
-		}
-		//Send a Message-----------------------------------------------------------
-		else if(choice=='1'){ 
+			break;
+		case '1'://Send message-------------------------------------------------------
 			cout<<"Please type in your Message: "<<endl;
-			string s;
+			//string s;
 			getchar();
 			getline(cin,s);
 			sendbuf=(char*)s.c_str();
-			if(send(ConnectSocket,sendbuf,(int)strlen(sendbuf),0)==SOCKET_ERROR){
+			if(send(ConnectSocket,sendbuf,(int)strlen(sendbuf)+1,0)==SOCKET_ERROR){
 				printf("send failed with error: %d\n", WSAGetLastError());
 				closesocket(ConnectSocket);
 				WSACleanup();
 				return 1;
 			}
+			break;
+		case '5': //Follow--------------------------------------------------------------
+			cout<<"Who do you want to follow?"<<endl;
+			//string s;
+			cin>>s;
+			sendbuf=(char*)s.c_str();
+			if(send(ConnectSocket,sendbuf,(int)strlen(sendbuf)+1,0)==SOCKET_ERROR){
+				printf("send failed with error: %d\n", WSAGetLastError());
+				closesocket(ConnectSocket);
+				WSACleanup();
+				return 1;
+			}
+			iResult=recv(ConnectSocket,recvbuf,recvbuflen,0);
+			if(iResult>0){
+				recvbuf[iResult]='\0';
+				if(strcmp(recvbuf,"50")==0){
+					cout<<"Sorry, the user ["<<s<<"] doesn't exist."<<endl;
+				}
+				else if(strcmp(recvbuf,"51")==0){
+					cout<<"Sorry, you can't follow yourself."<<endl;
+				}
+				else if(strcmp(recvbuf,"52")==0){
+					cout<<"Sorry, you have already followed ["<<s<<"]."<<endl;
+				}
+				else{
+					cout<<"You follow ["<<s<<"] successfully."<<endl;
+				}
+			}
+			break;
+		default:
+			cout<<"Wrong Selection"<<endl;
+			break;
 		}
 	}
-
-    //printf("Bytes Sent: %ld\n", iResult);
-
-    
-
-    // Receive until the peer closes the connection
-
-	// shutdown the connection since no more data will be sent
-   /* iResult = shutdown(ConnectSocket, SD_SEND);
-    if (iResult == SOCKET_ERROR) {
-        printf("shutdown failed with error: %d\n", WSAGetLastError());
-        closesocket(ConnectSocket);
-        WSACleanup();
-        return 1;
-    }*/
 
     // cleanup
 
