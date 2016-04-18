@@ -210,7 +210,6 @@ int __cdecl main(int argc, char **argv)
 			iResult=recv(ConnectSocket,recvbuf,recvbuflen,0);
 			if(iResult>0){
 				recvbuf[iResult]='\0';
-				cout<<"recvbuf"<<recvbuf<<endl;
 				if(strcmp(recvbuf,"60")==0){
 					cout<<"Sorry, the user ["<<s<<"] doesn't exist."<<endl;
 				}
@@ -230,6 +229,7 @@ int __cdecl main(int argc, char **argv)
 			cout<<"Wrong Selection"<<endl;
 			break;
 		}
+		cout<<endl;
 	}
 
     // cleanup
