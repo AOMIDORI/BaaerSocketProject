@@ -38,7 +38,7 @@ void connection_handler(SOCKET);
 void message_handler(int, int,SOCKET);
 void print_timeline(int,SOCKET);
 int follow_handler(int,SOCKET);
-
+int unfollow_handler(int,SOCKET);
 
 /*************************************************************
                              Main
@@ -227,6 +227,9 @@ void connection_handler(SOCKET ClntSock){
 			case '5':
 				follow_handler(userID,ClientSocket);
 				break;
+			case '6':
+				unfollow_handler(userID,ClientSocket);
+				break;
 			default:
 				cout<<"Invalid choice."<<endl;
 				break;
@@ -345,4 +348,69 @@ int follow_handler(int userID, SOCKET clntSocket){
 			return 1;
 	}
 	return friendID;
+}
+/***********************************************************************
+                         unfollow_handler()
+***********************************************************************/
+//60: User doesn't exist
+//61: unfollow him/her self
+//62: The user is not in the following list
+
+int unfollow_handler(int userID, SOCKET clntSocket){
+	SOCKET ClientSocket=clntSocket;
+	char recvbuf[DEFAULT_BUFLEN];
+	int recvbuflen = DEFAULT_BUFLEN;
+	char *sendbuf="";
+	unsigned int i;
+	int friendID=-1;
+	int iResult;
+	int iSendResult;
+	bool havefollowed=FALSE;
+
+	iResult=recv(ClientSocket,recvbuf,recvbuflen,0);
+	if(iResult>0){
+		recvbuf[iResult]='\0';
+		char *name=(char*)malloc(strlen(recvbuf)+1);
+		strcpy(name,recvbuf);
+		for(i=0;i<g_userlist[userID].following.size();i++){
+			if(strcmp(name,g_userlist[userID].following[i].name)==0){
+				havefollowed=TRUE;
+				break;
+			}
+		}
+		if(!havefollowed) sendbuf="62";
+		if(strcmp(name,g_userlist[userID].name)==0){
+			sendbuf="61";
+		}
+		else{
+			if(havefollowed){
+				for(i=0;i<g_userlist.size();i++){
+					if(strcmp(g_userlist[i].name,name)==0){
+						friendID=i;
+						for(vector<User>::iterator iter=g_userlist[userID].following.begin();iter!=g_userlist[userID].following.end();iter++){
+							if(strcmp(iter->name,name)==0){
+								g_userlist[userID].following.erase(iter);
+								break;
+							}
+						}
+						cout<<"["<<g_userlist[userID].name<<"] unfollows "<<name<<"."<<endl;
+						break;
+					}
+				}
+				if(i==g_userlist.size()){
+					sendbuf="60";
+					cout<<"Can't find the user."<<endl;
+				}
+			}
+		}
+	}
+	iSendResult=send(ClientSocket,sendbuf,(int)strlen(sendbuf)+1,0);
+	if(iSendResult==SOCKET_ERROR){
+			printf("send failed with error: %d\n", WSAGetLastError());
+			closesocket(ClientSocket);
+			WSACleanup();
+			return 1;
+	}
+	return friendID;
+
 }
