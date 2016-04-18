@@ -130,9 +130,8 @@ int __cdecl main(int argc, char **argv)
 		cout<<"6. Unfollow someone."<<endl;
 		cout<<"7. Log out." <<endl;
 		cout<<"-------------------------------------------------"<<endl;
-
 		char choice;
-		cout<<"Your choice number: ";
+		cout<<"Your choice number: "<<endl;
 		cin>>choice;
 		sendbuf[0]=choice;
 		if(send(ConnectSocket,sendbuf,(int)strlen(sendbuf)+1,0)==SOCKET_ERROR){
@@ -168,6 +167,8 @@ int __cdecl main(int argc, char **argv)
 				return 1;
 			}
 			break;
+		case '3'://Print user timeline-------------------------------------------------
+			break;
 		case '5': //Follow--------------------------------------------------------------
 			cout<<"Who do you want to follow?"<<endl;
 			//string s;
@@ -196,6 +197,35 @@ int __cdecl main(int argc, char **argv)
 				}
 			}
 			break;
+		case '6'://Unfollow---------------------------------------------------------------
+			cout<<"Who do you want to unfollow?"<<endl;
+			cin>>s;
+			sendbuf=(char*)s.c_str();
+			if(send(ConnectSocket,sendbuf,(int)strlen(sendbuf)+1,0)==SOCKET_ERROR){
+				printf("send failed with error: %d\n", WSAGetLastError());
+				closesocket(ConnectSocket);
+				WSACleanup();
+				return 1;
+			}
+			iResult=recv(ConnectSocket,recvbuf,recvbuflen,0);
+			if(iResult>0){
+				recvbuf[iResult]='\0';
+				cout<<"recvbuf"<<recvbuf<<endl;
+				if(strcmp(recvbuf,"60")==0){
+					cout<<"Sorry, the user ["<<s<<"] doesn't exist."<<endl;
+				}
+				else if(strcmp(recvbuf,"61")==0){
+					cout<<"Sorry, you can't unfollow yourself."<<endl;
+				}
+				else if(strcmp(recvbuf,"62")==0){
+					cout<<"Sorry, ["<<s<<"] is not your friend."<<endl;
+				}
+				else{
+					cout<<"You unfollow ["<<s<<"] successfully."<<endl;
+				}
+			}
+			break;
+
 		default:
 			cout<<"Wrong Selection"<<endl;
 			break;
