@@ -2,6 +2,7 @@
 
 #define WIN32_LEAN_AND_MEAN
 
+
 #include <windows.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
@@ -14,6 +15,8 @@
 #include <mutex>
 #include <chrono>
 #include "Database.h"
+
+#include "stdafx.h"
 
 using namespace std;
 
@@ -32,6 +35,11 @@ vector<string> g_namelist;
 vector<User> g_userlist;
 //vector<Message> g_messagelist;
 
+//global variables
+map<string,vector<Message>> g_messages;
+string currentUser =  "user";
+int allMessageIds = 0;
+
 
 //.......functions predeclaration..........
 void connection_handler(SOCKET);
@@ -39,6 +47,9 @@ void message_handler(int, int,SOCKET);
 void print_timeline(int,SOCKET);
 int follow_handler(int,SOCKET);
 int unfollow_handler(int,SOCKET);
+//from ConductProtocol.cpp
+int conduct_protocol(SOCKET ClientSocket);
+int ready(SOCKET ClientSocket);
 
 /*************************************************************
                              Main
@@ -329,6 +340,7 @@ int follow_handler(int userID, SOCKET clntSocket){
 					if(strcmp(g_userlist[i].name,name)==0){
 						friendID=i;
 						g_userlist[userID].following.push_back(g_userlist[i]);
+						//aha, I get it. The User Object of the user to follow is pushed to following<User>
 						cout<<"["<<g_userlist[userID].name<<"] follows "<<name<<"."<<endl;
 						break;
 					}
