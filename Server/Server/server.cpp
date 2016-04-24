@@ -16,12 +16,11 @@ using namespace std;
 //.......Global variables.................
 int g_usercount=0;
 int g_messagecount=0;
-mutex g_mutex;
+mutex g_message_mutex;
+mutex g_user_mutex;
+mutex g_namelist_mutex;
 vector<string> g_namelist;
 vector<User> g_userlist;
-//vector<Message> g_messagelist;
-
-//global variables
 map<string,vector<Message>> g_messages;
 int allMessageIds = 0;
 
@@ -144,6 +143,9 @@ void connection_handler(SOCKET ClntSock){
 		recvbuf[iResult]='\0';
 		string username(recvbuf);
 		cout<<"Name received: ["<<username<<"], checking..."<<endl;
+
+		g_namelist_mutex.lock();
+
 		if(find(g_namelist.begin(),g_namelist.end(),username)!=g_namelist.end()){
 			//cout<<"The user exists."<<endl;
 		}
@@ -158,23 +160,33 @@ void connection_handler(SOCKET ClntSock){
 			}
 			u.name[i]='\0';
 			u.status=0;
+			g_user_mutex.lock();
 			g_userlist.push_back(u);
+			g_user_mutex.unlock();
+			//cout<<"Adding user to database."<<endl;
 		}
+		g_namelist_mutex.unlock();
+
 		//check if the user is taken
 		bool usertaken=FALSE;
+		g_user_mutex.lock();
 		for(userID=0;userID<g_userlist.size();userID++){
 			if(username.compare(g_userlist[userID].name)==0){		
 				if(g_userlist[userID].status==1){
 					usertaken=TRUE;
-					cout<<"Log in declined."<<endl;
+					cout<<"User currently logged in. Log in declined."<<endl;
 					break;
 				}	
 				break;
 			}
 		}
+		g_user_mutex.unlock();
+
 		//send the login result to the user.
 		if(!usertaken){
+			g_user_mutex.lock();
 			g_userlist[userID].status=1;
+			g_user_mutex.unlock();
 			sendbuf="00"; //The user can log in
 			iflogin=TRUE;
 			if(send(ClientSocket, sendbuf, (int)strlen(sendbuf)+1,0)==SOCKET_ERROR){ //[Z2]
@@ -183,7 +195,10 @@ void connection_handler(SOCKET ClntSock){
 				WSACleanup();
 				exit(1);
 			}
+
+			g_user_mutex.lock();
 			cout<<"["<<g_userlist[userID].name<<"] log in"<<endl;
+			g_user_mutex.unlock();
 
 		}
 		else{
@@ -194,22 +209,24 @@ void connection_handler(SOCKET ClntSock){
 				WSACleanup();
 				exit(1);
 			}
-			///break;
 		}
-	}
-	else if (iResult == 0)
+	}else if (iResult == 0){
 		printf("Connection closing...\n");
-
+	}
 
 	//Receive menu choice from client ------------------------------------------
 	if(iflogin){
 		int result = conduct_protocol(ClientSocket, userID);
 		iflogin=false;
-	}
 
-	g_userlist[userID].status=0;
-	cout<<g_userlist[userID].name<<" has logged out"<<endl;
-	send(ClientSocket, "99", 2,0);
+		g_user_mutex.lock();
+		g_userlist[userID].status=0;
+		cout<<g_userlist[userID].name<<" has logged out"<<endl;
+		g_user_mutex.unlock();
+		send(ClientSocket, "99", 2,0);
+	}else{
+		cout<<"Login failed."<<endl;
+	}
 
 	//shutdown the connection since we're done
 	iResult = shutdown(ClientSocket, SD_SEND);
@@ -220,46 +237,6 @@ void connection_handler(SOCKET ClntSock){
 		exit(1);
 	}
 	closesocket(ClientSocket);
+	cout<<"exiting";
 }
-
-/////////////////////////////////////////////////////////////////////////////////
-/**********************************************************************
-                        message_handler()
-***********************************************************************/
-/*void message_handler(int option, int userID,SOCKET clntSocket){
-	SOCKET ClientSocket=clntSocket;
-	char recvbuf[DEFAULT_BUFLEN];
-	int recvbuflen = DEFAULT_BUFLEN;
-	int iResult;
-	if(option==0){ //send a message
-		g_mutex.lock();
-		iResult=recv(ClientSocket,recvbuf,recvbuflen,0);
-		g_mutex.unlock();
-		if(iResult>0){
-			recvbuf[iResult]='\0';
-			g_messagecount++;  //to generate the ID
-			struct Message m;
-			m.messageID=g_messagecount;
-			m.text=(char*)malloc(iResult);
-			strcpy(m.text,recvbuf);
-			m.publishtime=NULL;
-			//time_t rawtime;
-			//m.publishtime=localtime(&rawtime);
-			//printf("%s\n",asctime(m.publishtime));
-			g_userlist[userID].messagelist.push_back(m);
-		}
-	}
-	if(option==1){ //Delete a message
-
-	}
-}*/
-/*********************************************************************
-                         print_timeline()
-*********************************************************************/
-/*void print_timeline(int userID,SOCKET clntSocket){
-	int i;
-	for(i=0;i<(int)g_userlist[userID].messagelist.size();i++){
-		cout<<g_userlist[userID].messagelist[i].text<<endl;
-	}
-}*/
 

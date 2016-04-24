@@ -3,11 +3,17 @@ using namespace std;
 
 extern map<string,vector<Message>> g_messages;
 extern vector<User> g_userlist;
+extern mutex g_user_mutex;
+extern mutex g_message_mutex;
+
+
 
 int initialize(int userID){
 
+	g_user_mutex.lock();
 	string currentUser=g_userlist[userID].name;
-		
+	g_user_mutex.unlock();
+
 	User bill;
 	bill.name="Bill";
 
@@ -16,9 +22,12 @@ int initialize(int userID){
 	jim.status=1;
 	jim.following.push_back(bill); //Jim is following bill. bob is the example user
 
+	g_user_mutex.lock();
 	g_userlist.push_back(jim);
 	g_userlist.push_back(bill);
+	g_user_mutex.unlock();
 
+	g_message_mutex.lock();
 	g_messages["Bill"]; 
 
 	//add a message for bill
@@ -30,6 +39,7 @@ int initialize(int userID){
 	}else{
 		cout<<"Bill not found!"<<endl;
 	}
+	g_message_mutex.unlock();
 	
 	return 0;
 }

@@ -1,36 +1,19 @@
-P:\VISUAL STUDIO\CLIENT\CLIENT\DEBUG\CLIENT.OBJ
-P:\VISUAL STUDIO\CLIENT\CLIENT\DEBUG\VC110.PDB
-P:\VISUAL STUDIO\CLIENT\CLIENT\DEBUG\CLIENTSAM.OBJ
-P:\VISUAL STUDIO\CLIENT\CLIENT\DEBUG\READFUNCTIONS.OBJ
-P:\VISUAL STUDIO\CLIENT\CLIENT\DEBUG\SENDMESSAGE.OBJ
-P:\VISUAL STUDIO\CLIENT\CLIENT\DEBUG\PARSING.OBJ
-P:\VISUAL STUDIO\CLIENT\CLIENT\DEBUG\MYTIMELINE.OBJ
-P:\VISUAL STUDIO\CLIENT\CLIENT\DEBUG\CONDUCTPROTOCOL.OBJ
-P:\VISUAL STUDIO\CLIENT\CLIENT\DEBUG\DELETEMESSAGE.OBJ
-P:\VISUAL STUDIO\CLIENT\CLIENT\DEBUG\TIMELINE.OBJ
 P:\CMPARCHGIT\CLIENT\CLIENT\DEBUG\CLIENT.OBJ
-P:\CMPARCHGIT\CLIENT\CLIENT\DEBUG\CLIENTSAM.OBJ
 P:\CMPARCHGIT\CLIENT\CLIENT\DEBUG\CONDUCTPROTOCOL.OBJ
 P:\CMPARCHGIT\CLIENT\CLIENT\DEBUG\DELETEMESSAGE.OBJ
+P:\CMPARCHGIT\CLIENT\CLIENT\DEBUG\FOLLOW.OBJ
 P:\CMPARCHGIT\CLIENT\CLIENT\DEBUG\TIMELINE.OBJ
 P:\CMPARCHGIT\CLIENT\CLIENT\DEBUG\PARSING.OBJ
 P:\CMPARCHGIT\CLIENT\CLIENT\DEBUG\SENDMESSAGE.OBJ
 P:\CMPARCHGIT\CLIENT\CLIENT\DEBUG\VC110.PDB
-P:\CMPARCHGIT\CLIENT\CLIENT\DEBUG\FOLLOW.OBJ
-P:\VISUAL STUDIO\CLIENT\DEBUG\CLIENT.ILK
-P:\VISUAL STUDIO\CLIENT\DEBUG\CLIENT.EXE
-P:\VISUAL STUDIO\CLIENT\DEBUG\CLIENT.PDB
 P:\CMPARCHGIT\CLIENT\DEBUG\CLIENT.ILK
 P:\CMPARCHGIT\CLIENT\DEBUG\CLIENT.EXE
 P:\CMPARCHGIT\CLIENT\DEBUG\CLIENT.PDB
 P:\CmpArchGit\Client\Client\Debug\client.obj
-P:\CmpArchGit\Client\Client\Debug\ClientSam.obj
 P:\CmpArchGit\Client\Client\Debug\ConductProtocol.obj
 P:\CmpArchGit\Client\Client\Debug\deleteMessage.obj
 P:\CmpArchGit\Client\Client\Debug\follow.obj
-P:\CmpArchGit\Client\Client\Debug\myTimeline.obj
 P:\CmpArchGit\Client\Client\Debug\Parsing.obj
-P:\CmpArchGit\Client\Client\Debug\readFunctions.obj
 P:\CmpArchGit\Client\Client\Debug\sendMessage.obj
 P:\CmpArchGit\Client\Client\Debug\timeline.obj
 P:\CmpArchGit\Client\Client\Debug\cl.command.1.tlog
@@ -40,108 +23,6 @@ P:\CmpArchGit\Client\Client\Debug\link-cvtres.read.1.tlog
 P:\CmpArchGit\Client\Client\Debug\link-cvtres.write.1.tlog
 P:\CmpArchGit\Client\Client\Debug\link-rc.read.1.tlog
 P:\CmpArchGit\Client\Client\Debug\link-rc.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.12160-cvtres.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.12160-cvtres.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.12160-rc.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.12160-rc.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.12160.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.12160.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.14772-cvtres.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.14772-cvtres.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.14772-rc.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.14772-rc.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.14772.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.14772.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.18000-cvtres.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.18000-cvtres.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.18000-rc.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.18000-rc.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.18000.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.18000.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.25420-cvtres.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.25420-cvtres.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.25420-rc.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.25420-rc.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.25420.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.25420.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.25428-cvtres.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.25428-cvtres.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.25428-rc.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.25428-rc.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.25428.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.25428.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.27908-cvtres.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.27908-cvtres.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.27908-rc.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.27908-rc.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.27908.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.27908.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.39500-cvtres.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.39500-cvtres.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.39500-rc.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.39500-rc.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.39500.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.39500.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.43824-cvtres.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.43824-cvtres.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.43824-rc.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.43824-rc.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.43824.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.43824.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.49212-cvtres.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.49212-cvtres.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.49212-rc.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.49212-rc.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.49212.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.49212.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.52408-cvtres.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.52408-cvtres.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.52408-rc.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.52408-rc.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.52408.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.52408.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.53448-cvtres.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.53448-cvtres.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.53448-rc.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.53448-rc.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.53448.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.53448.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.53992-cvtres.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.53992-cvtres.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.53992-rc.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.53992-rc.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.53992.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.53992.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.54460-cvtres.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.54460-cvtres.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.54460-rc.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.54460-rc.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.54460.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.54460.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.60792-cvtres.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.60792-cvtres.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.60792-rc.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.60792-rc.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.60792.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.60792.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.66556-cvtres.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.66556-cvtres.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.66556-rc.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.66556-rc.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.66556.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.66556.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.75352-cvtres.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.75352-cvtres.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.75352-rc.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.75352-rc.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.75352.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.75352.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.9416-cvtres.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.9416-cvtres.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.9416-rc.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.9416-rc.write.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.9416.read.1.tlog
-P:\CmpArchGit\Client\Client\Debug\link.9416.write.1.tlog
 P:\CmpArchGit\Client\Client\Debug\link.command.1.tlog
 P:\CmpArchGit\Client\Client\Debug\link.read.1.tlog
 P:\CmpArchGit\Client\Client\Debug\link.write.1.tlog

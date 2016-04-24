@@ -3,6 +3,8 @@ using namespace std;
 
 extern map<string,vector<Message>> g_messages;
 extern vector<User> g_userlist;
+extern mutex g_user_mutex;
+extern mutex g_message_mutex;
 
 //from parsing
 vector<string> packageString(string input);
@@ -12,7 +14,9 @@ int ready(SOCKET);
 
 int printFriendsTimeline(SOCKET ClientSocket, int userID){
 
+	g_user_mutex.lock();
 	string currentUser=g_userlist[userID].name;
+	g_user_mutex.unlock();
 
 	char recvbuf[DEFAULT_BUFLEN];
 	int recvbuflen=DEFAULT_BUFLEN;
@@ -23,8 +27,10 @@ int printFriendsTimeline(SOCKET ClientSocket, int userID){
 
 	vector<Message> friendMessages;//hold messages from all friends in following<User>
 	//get the messages from each follower
+	g_user_mutex.lock();
 	for(User myFriend: g_userlist[userID].following){
-		//get the messages of this friend		
+		//get the messages of this friend
+		g_message_mutex.lock();
 		auto friendIt = g_messages.find(myFriend.name);
 		if(friendIt !=g_messages.end()){
 			int nFriendMsg = friendIt->second.size(); 
@@ -33,7 +39,9 @@ int printFriendsTimeline(SOCKET ClientSocket, int userID){
 				friendMessages.push_back(thisMessage);
 			}
 		}//else, leave friendMessages empty
+		g_message_mutex.unlock();
 	}
+	g_user_mutex.unlock();
 
 	int nMessages = friendMessages.size();
 	if(nMessages<1){

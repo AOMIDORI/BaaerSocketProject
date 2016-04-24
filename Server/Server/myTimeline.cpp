@@ -3,6 +3,8 @@ using namespace std;
 
 extern map<string,vector<Message>> g_messages;
 extern vector<User> g_userlist;
+extern mutex g_user_mutex;
+extern mutex g_message_mutex;
 
 //from parsing
 vector<string> packageString(string input);
@@ -12,7 +14,9 @@ int ready(SOCKET);
 
 int printMyTimeline(SOCKET ClientSocket, int userID){
 	
+	g_user_mutex.lock();
 	string currentUser=g_userlist[userID].name;
+	g_user_mutex.unlock();
 
 	char recvbuf[DEFAULT_BUFLEN];
 	int recvbuflen=DEFAULT_BUFLEN;
@@ -21,20 +25,27 @@ int printMyTimeline(SOCKET ClientSocket, int userID){
 	int setSize = DEFAULT_BUNDLE; //max number of messages to send at one time
 
 	//we need to get the messages of every user in the user's 'following' list
-	
+	g_message_mutex.lock();
 	auto it = g_messages.find(currentUser);
-	if(it==g_messages.end()){
+	auto endIt = g_messages.end();
+	g_message_mutex.unlock();
+
+	if(it==endIt){
 		send(ClientSocket, "-1", 2, 0 ); //I dont have any messages!
 		int iRecieve = recv(ClientSocket, recvbuf, recvbuflen, 0);//ready to exit? [T0]
 		return 0;
 	}
 
+	g_message_mutex.lock();
 	int nMessages = it->second.size();
+	g_message_mutex.unlock();
 	cout<<"found "<<nMessages<<" messages for user "<<currentUser<<endl;
 	if(nMessages<1){
 		send(ClientSocket, "-1", 2, 0 ); //I dont have any messages!
+		int iRecieve = recv(ClientSocket, recvbuf, recvbuflen, 0);//ready to exit? [T0]
 		return 0;
 	}
+	
 
 	//get 10 messages at a time
 	int setNumber = 1;
@@ -46,7 +57,9 @@ int printMyTimeline(SOCKET ClientSocket, int userID){
 		string sendString="";
 
 		for(int i=startWith; i<nMessages && i<(startWith + setSize ); i++){
+			g_message_mutex.lock();
 			string message = it->second.at(i).content; 
+			g_message_mutex.unlock();
 			userMessages.push_back(message);
 		}
 		

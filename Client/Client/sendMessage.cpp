@@ -10,9 +10,6 @@ int sendMessage(SOCKET ConnectSocket, std::string message){
 	bool notDoneYet = false;
 	int iResponse=-1;
 
-	if(message.length()<1){
-		return 0;
-	}
 	//divide message into sets w length DEFAULT_BUFLEN
 	vector<string> messagePkgs = packageString(message);
 	iResponse = sendAllPackages(messagePkgs, ConnectSocket);
@@ -25,6 +22,9 @@ int newMessage(SOCKET ConnectSocket){
 	cout<<"Enter a message: "<<endl<<"(Click enter to exit)"<<endl;
 	string message;
 	getline(cin,message);
+	if(message.length()<1){
+		return 0;
+	}
 
 	int iResult = sendMessage(ConnectSocket, message);
 

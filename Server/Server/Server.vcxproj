@@ -20,7 +20,9 @@
     <ClCompile Include="Message.cpp" />
     <ClCompile Include="myTimeline.cpp" />
     <ClCompile Include="Parsing.cpp" />
+    <ClCompile Include="saveDB.cpp" />
     <ClCompile Include="server.cpp" />
+    <ClCompile Include="User.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Message.h" />

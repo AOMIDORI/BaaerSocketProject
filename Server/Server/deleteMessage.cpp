@@ -3,20 +3,29 @@ using namespace std;
 
 extern map<string,vector<Message>> g_messages;
 extern vector<User> g_userlist;
+extern mutex g_user_mutex;
+extern mutex g_message_mutex;
+
+
 
 int deleteMessage(SOCKET ClientSocket, vector<string> tolkens, int userID){
-
+	g_user_mutex.lock();
 	string currentUser=g_userlist[userID].name;
+	g_user_mutex.unlock();
 
 	//06:MessageToDelete
 	int messageToDelete= stoi(tolkens.at(1));
 	//find user messages in db
+	g_message_mutex.lock();
 	auto userIt = g_messages.find(currentUser); //userIt->second is the user's message vector
 	cout<<"user wants to delete message message "<<messageToDelete;
 	cout<<" of "<<userIt->second.size()<<endl;
+	g_message_mutex.unlock();
 
 	if(messageToDelete < userIt->second.size()){
+		g_message_mutex.lock();
 		userIt->second.erase(userIt->second.begin()+messageToDelete);
+		g_message_mutex.unlock();
 		cout<<"Deleted user message at "<<messageToDelete<<endl;
 		int iSendResult = send(ClientSocket, "Y", 1, 0 ); 
 	}else{

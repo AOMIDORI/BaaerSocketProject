@@ -2,9 +2,10 @@
 
 using namespace std;
 
-extern mutex g_mutex;
 extern map<string,vector<Message>> g_messages;
 extern vector<User> g_userlist;
+extern mutex g_user_mutex;
+
 /***********************************************************************
                          follow_handler()
 ***********************************************************************/
@@ -24,13 +25,13 @@ int follow_handler(int userID, SOCKET clntSocket){
 	bool havefollowed=FALSE;
 
 	iResult = send(ClientSocket, "F0", 2, 0);//ready for you to send the username [F0]
-	g_mutex.lock();
 	iResult=recv(ClientSocket,recvbuf,recvbuflen,0); //[F1] user to follow
-	g_mutex.unlock();
 	if(iResult>0){
 		recvbuf[iResult]='\0';
 		char *name=(char*)malloc(strlen(recvbuf)+1);
 		strcpy_s(name, sizeof(name)+1, recvbuf);
+
+		g_user_mutex.lock();
 		for(i=0;i<g_userlist[userID].following.size();i++){
 			if(strcmp(name,g_userlist[userID].following[i].name)==0){
 				havefollowed=TRUE;
@@ -59,6 +60,7 @@ int follow_handler(int userID, SOCKET clntSocket){
 				}
 			}
 		}
+		g_user_mutex.unlock();
 	}
 
 	iSendResult=send(ClientSocket,sendbuf,(int)strlen(sendbuf)+1,0);//[F2]
@@ -98,6 +100,7 @@ int unfollow_handler(int userID, SOCKET clntSocket){
 		recvbuf[iResult]='\0';
 		char *name=(char*)malloc(strlen(recvbuf)+1);
 		strcpy_s(name,sizeof(name)+1,recvbuf);
+		g_user_mutex.lock();
 		for(i=0;i<g_userlist[userID].following.size();i++){
 			if(strcmp(name,g_userlist[userID].following[i].name)==0){
 				havefollowed=TRUE;
@@ -130,6 +133,7 @@ int unfollow_handler(int userID, SOCKET clntSocket){
 				}
 			}
 		}
+		g_user_mutex.unlock();
 	}
 	iSendResult=send(ClientSocket,sendbuf,(int)strlen(sendbuf)+1,0); //[U2]
 	if(iSendResult==SOCKET_ERROR){

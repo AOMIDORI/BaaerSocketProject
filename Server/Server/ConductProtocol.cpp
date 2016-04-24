@@ -19,8 +19,14 @@ int initialize(int userID);
 //from server.cpp
 int follow_handler(int userID, SOCKET clntSocket);
 int unfollow_handler(int userID, SOCKET clntSocket);
+//Message.cpp (also contains override of stream <<(Message) and >>(Message)
+int writeMsgDB();
+map<string,vector<Message>> readMsgDB();
 
 extern vector<User> g_userlist;
+extern map<string,vector<Message>> g_messages;
+extern mutex g_user_mutex;
+extern mutex g_message_mutex;
 
 int ready(SOCKET ClientSocket){ //tell the client you are ready for the next instruction
 
@@ -41,7 +47,9 @@ int readyCP(SOCKET ClientSocket){ //tell the client you are waiting in conduct p
 
 
 int conduct_protocol(SOCKET ClientSocket, int userID){
+	g_user_mutex.lock();
 	string currentUser=g_userlist[userID].name;
+	g_user_mutex.unlock();
 
  // Receive until the peer shuts down the connection
     int iResult;
@@ -49,7 +57,10 @@ int conduct_protocol(SOCKET ClientSocket, int userID){
 	
 	int recvbuflen=DEFAULT_BUFLEN;
 
-	if(g_userlist.size()<2){
+	g_user_mutex.lock();
+	bool firstTime=(g_userlist.size()<2);
+	g_user_mutex.unlock();
+	if(firstTime){
 		initialize(userID);//creates users Bill and Jim, Jim is following Bill. Bill has a message
 	}
 
@@ -96,39 +107,33 @@ int conduct_protocol(SOCKET ClientSocket, int userID){
 			   cout<<"Unknown command"<<endl;
 		   }
 
-		   /*while(iflogin){
-		iResult=recv(ClientSocket,recvbuf,recvbuflen,0);
-		if(iResult>0){
-			cout<<"Choice from ["<<g_userlist[userID].name<<"]: "<<recvbuf[0]<<endl;
-			switch (recvbuf[0]){
-			case '7':
-				g_userlist[userID].status=0;
-				cout<<"["<<g_userlist[userID].name<<"] log out."<<endl;
-				iflogin=FALSE;
-				break;
-			case '1':
-				cout<<"["<<g_userlist[userID].name<<"] send a message."<<endl;
-				message_handler(0,userID,ClientSocket);
-				break;
-			case '3':
-				cout<<"Printing ["<<g_userlist[userID].name<<"]'s timeline:"<<endl;
-				print_timeline(userID,ClientSocket);
-				break;
-			case '5':
-				follow_handler(userID,ClientSocket);
-				break;
-			case '6':
-				unfollow_handler(userID,ClientSocket);
-				break;
-			default:
-				cout<<"Invalid choice."<<endl;
-				break;
-			}
-		}*/
-
-
 		   readyCP(ClientSocket);
 
+		   std::ofstream ofs("saved.txt");
+
+			//if(g_messages.size()>0){
+			//	
+			//	cout<<"We are going to save a message to a file."<<endl;
+
+			//	auto mIt=g_messages.find(currentUser);//current user's first msg
+			//	Message m1 = mIt->second.at(0);
+			//	ofs << m1; // store the object to file
+			//	ofs.close();
+			//	cout<<"Saved. Check saved.txt"<<endl;
+
+
+			//	std::ifstream ifs("saved.txt");
+
+			//	// read the object back in
+			//	if(ifs >> m1)
+			//	{
+			//		// read was successful therefore m1 is valid
+			//		cout<<"We got the object back!"<<endl;
+			//		std::cout << "message text: "<< m1.content << endl; // print s2 to console
+			//	}
+			//}
+			writeMsgDB();
+			readMsgDB();
         }
         else if (iResult == 0)
             printf("Connection closing...\n");
