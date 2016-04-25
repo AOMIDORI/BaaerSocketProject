@@ -11,6 +11,8 @@ vector<string> packageString(string input);
 //from conduct protocol
 int sendAllPackages(vector<string> messagePkgs, SOCKET ConnectSocket);
 int ready(SOCKET);
+//from User.cpp
+User getUser(int ID);
 
 int printFriendsTimeline(SOCKET ClientSocket, int userID){
 
@@ -28,12 +30,15 @@ int printFriendsTimeline(SOCKET ClientSocket, int userID){
 	vector<Message> friendMessages;//hold messages from all friends in following<User>
 	//get the messages from each follower
 	g_user_mutex.lock();
-	for(User myFriend: g_userlist[userID].following){
+	vector<int> iFollow = g_userlist[userID].following;
+	for(int friendID: iFollow){
+		User myFriend=getUser(friendID);
 		//get the messages of this friend
 		g_message_mutex.lock();
 		auto friendIt = g_messages.find(myFriend.name);
 		if(friendIt !=g_messages.end()){
 			int nFriendMsg = friendIt->second.size(); 
+			//load all of the friend's messages
 			for(int i=0; i<nFriendMsg; i++){
 				Message thisMessage = friendIt->second.at(i); 
 				friendMessages.push_back(thisMessage);
@@ -59,6 +64,7 @@ int printFriendsTimeline(SOCKET ClientSocket, int userID){
 	int setNumber = 1;
 	int numberOfSets = nMessages/setSize + 1;
 	int startWith = 0; //which user message is the first that needs to be sent
+	int iRecieve;
 
 	//sending sets of DEFAULT_BUNDLE messages to client, asking if they want more
 	do{ //while(there are more messages left)
@@ -66,7 +72,8 @@ int printFriendsTimeline(SOCKET ClientSocket, int userID){
 
 		//now we have up to setSize (eg 10) messages in a vector. send them with | knife 
 		for(Message s:friendMessages){
-			sendString+="@"+s.user+"  ";
+			string username = getUser(s.user).name;
+			sendString+="@"+username+"  ";
 			sendString+=s.content;
 			sendString+="|";
 		}
@@ -76,7 +83,8 @@ int printFriendsTimeline(SOCKET ClientSocket, int userID){
 		vector<string> messagePkgs = packageString(sendString);
 
 		int iSendResult = sendAllPackages(messagePkgs, ClientSocket);
-		int iRecieve = recv(ClientSocket, recvbuf, recvbuflen, 0);//let me know whey you're ready [A]
+		iRecieve = send(ClientSocket, "T1", 2, 0);//ready to proceed? [T1]
+		iRecieve = recv(ClientSocket, recvbuf, recvbuflen, 0);//let me know whey you're ready [T2]
 		cout<<"sent messages"<<endl;
 
 		//do we have more messages?
@@ -84,12 +92,12 @@ int printFriendsTimeline(SOCKET ClientSocket, int userID){
 			//ask if they want more or are done
 			char* sendcmd = "12"; //I have more messages!
 			cout<<"I have more messages..."<<endl;
-			send(ClientSocket, sendcmd, (int)strlen(sendcmd), 0 ); //ready to get server info (just an extra checkpoint)
+			send(ClientSocket, sendcmd, (int)strlen(sendcmd), 0 ); //ready to get server info [T3]
 		}else{//no more messages available
 			cout<<"no more messages. sending 00"<<endl;
 			ready(ClientSocket);
 		}
-		iRecieve = recv(ClientSocket, recvbuf, recvbuflen, 0);//0 done, 12 print more
+		iRecieve = recv(ClientSocket, recvbuf, recvbuflen, 0);//0 done, 12 print more [T4]
 		//cout<<"Client says: "<<recvbuf<<endl;
 		int cmd = atoi(recvbuf);
 		if(cmd != 12){//nope, they don't want any more
@@ -100,7 +108,8 @@ int printFriendsTimeline(SOCKET ClientSocket, int userID){
 			setNumber += 1;
 	}while(startWith < nMessages);
 
-	int iRecieve = recv(ClientSocket, recvbuf, recvbuflen, 0);//ready to exit? [C]
+	iRecieve = send(ClientSocket, "T5", 2, 0);//waiting to exit? [T5]
+	iRecieve = recv(ClientSocket, recvbuf, recvbuflen, 0);//ready to exit? [T6]
 	//cout<<"exiting printTimeline function"<<endl;
 	return 0;
 }

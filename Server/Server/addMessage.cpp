@@ -30,7 +30,7 @@ int addMessage(vector<string> tolkens, SOCKET ClientSocket, int userID){
 		return 0;
 	}
 	//put it in the database	
-	Message newMessage = Message(message, currentUser);
+	Message newMessage = Message(message, userID);
 	g_message_mutex.lock();
 	g_messages[currentUser]; 
 	auto it = g_messages.find(currentUser);

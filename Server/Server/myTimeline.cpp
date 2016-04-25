@@ -20,6 +20,7 @@ int printMyTimeline(SOCKET ClientSocket, int userID){
 
 	char recvbuf[DEFAULT_BUFLEN];
 	int recvbuflen=DEFAULT_BUFLEN;
+	int iRecieve;
 
 	//get my messages from db
 	int setSize = DEFAULT_BUNDLE; //max number of messages to send at one time
@@ -32,7 +33,7 @@ int printMyTimeline(SOCKET ClientSocket, int userID){
 
 	if(it==endIt){
 		send(ClientSocket, "-1", 2, 0 ); //I dont have any messages!
-		int iRecieve = recv(ClientSocket, recvbuf, recvbuflen, 0);//ready to exit? [T0]
+		iRecieve = recv(ClientSocket, recvbuf, recvbuflen, 0);//ready to exit? [T0]
 		return 0;
 	}
 
@@ -42,7 +43,7 @@ int printMyTimeline(SOCKET ClientSocket, int userID){
 	cout<<"found "<<nMessages<<" messages for user "<<currentUser<<endl;
 	if(nMessages<1){
 		send(ClientSocket, "-1", 2, 0 ); //I dont have any messages!
-		int iRecieve = recv(ClientSocket, recvbuf, recvbuflen, 0);//ready to exit? [T0]
+		iRecieve = recv(ClientSocket, recvbuf, recvbuflen, 0);//ready to exit? [T0]
 		return 0;
 	}
 	
@@ -75,7 +76,8 @@ int printMyTimeline(SOCKET ClientSocket, int userID){
 		vector<string> messagePkgs = packageString(sendString);
 
 		int iSendResult = sendAllPackages(messagePkgs, ClientSocket);
-		int iRecieve = recv(ClientSocket, recvbuf, recvbuflen, 0);//let me know whey you're ready [A]
+		iRecieve = send(ClientSocket, "T1", 2, 0);//ready to proceed? [T1]
+		iRecieve = recv(ClientSocket, recvbuf, recvbuflen, 0);//let me know whey you're ready [T2]
 		cout<<"sent messages"<<endl;
 
 
@@ -84,12 +86,12 @@ int printMyTimeline(SOCKET ClientSocket, int userID){
 			//ask if they want more or are done
 			char* sendcmd = "12"; //I have more messages!
 			cout<<"I have more messages..."<<endl;
-			send(ClientSocket, sendcmd, (int)strlen(sendcmd), 0 ); //ready to get server info
+			send(ClientSocket, sendcmd, (int)strlen(sendcmd), 0 ); //ready to get server info [T3]
 		}else{//no more messages available
 			cout<<"no more messages. sending 00"<<endl;
-			ready(ClientSocket);
+			ready(ClientSocket); //[T3]
 		}
-		iRecieve = recv(ClientSocket, recvbuf, recvbuflen, 0);//0 done, 12 print more [B]
+		iRecieve = recv(ClientSocket, recvbuf, recvbuflen, 0);//0 done, 12 print more [T4]
 		//cout<<"Client says: "<<recvbuf<<endl;
 		int cmd = atoi(recvbuf);
 		if(cmd != 12){//nope, they don't want any more
@@ -100,8 +102,8 @@ int printMyTimeline(SOCKET ClientSocket, int userID){
 			setNumber += 1;
 	}while(startWith < nMessages);
 
-
-	int iRecieve = recv(ClientSocket, recvbuf, recvbuflen, 0);//ready to exit? [C]
+	iRecieve = send(ClientSocket, "T5", 2, 0);//waiting to exit? [T5]
+	iRecieve = recv(ClientSocket, recvbuf, recvbuflen, 0);//ready to exit? [T6]
 	cout<<"exiting printTimeline function"<<endl;
 	return 0;
 }

@@ -5,6 +5,14 @@ using namespace std;
 extern map<string,vector<Message>> g_messages;
 extern vector<User> g_userlist;
 extern mutex g_user_mutex;
+extern mutex g_storage_mutex;
+
+//from User.cpp
+User getUser(int id);
+//from Message.cpp
+map<string,vector<Message>> loadFriendMessages(vector<int> friendList);
+int update_g_messages(map<string,vector<Message>> friendMessages);
+vector<int> whoToLoad(list<int> keepLocally);
 
 /***********************************************************************
                          follow_handler()
@@ -32,13 +40,16 @@ int follow_handler(int userID, SOCKET clntSocket){
 		strcpy_s(name, sizeof(name)+1, recvbuf);
 
 		g_user_mutex.lock();
+		//have they already followed?
 		for(i=0;i<g_userlist[userID].following.size();i++){
-			if(strcmp(name,g_userlist[userID].following[i].name)==0){
+			User theFriend=getUser(g_userlist[userID].following[i]);
+			if(strcmp(name,theFriend.name)==0){
 				havefollowed=TRUE;
 				sendbuf="52";
 				break;
 			}
 		}
+		//trying to follow themself
 		if(strcmp(name,g_userlist[userID].name)==0){
 			sendbuf="51";
 		}
@@ -46,11 +57,19 @@ int follow_handler(int userID, SOCKET clntSocket){
 			if(!havefollowed){
 				for(i=0;i<g_userlist.size();i++){
 					if(strcmp(g_userlist[i].name,name)==0){
-						friendID=i;
-						g_userlist[userID].following.push_back(g_userlist[i]);
-						//The User Object of the user to follow is pushed to following<User>
+						//Add them to following
+						//The ID of the user to follow is pushed to current user.following<int>
+						g_userlist[userID].following.push_back(g_userlist[i].ID);
 						cout<<"["<<g_userlist[userID].name<<"] follows "<<name<<"."<<endl;
 						sendbuf="53";
+
+						list<int> keepLocally;
+						keepLocally.push_back(g_userlist[i].ID);
+						//only load user if they're not in local storage yet
+						vector<int> usersToLoad = whoToLoad(keepLocally);
+						//load them to local storage
+						loadFriendMessages(usersToLoad);
+
 						break;
 					}
 				}
@@ -101,23 +120,28 @@ int unfollow_handler(int userID, SOCKET clntSocket){
 		char *name=(char*)malloc(strlen(recvbuf)+1);
 		strcpy_s(name,sizeof(name)+1,recvbuf);
 		g_user_mutex.lock();
+		//check if already following 
 		for(i=0;i<g_userlist[userID].following.size();i++){
-			if(strcmp(name,g_userlist[userID].following[i].name)==0){
+			User theFriend=getUser(g_userlist[userID].following[i]);
+			if(strcmp(name,theFriend.name)==0){
 				havefollowed=TRUE;
 				break;
 			}
 		}
 		if(!havefollowed) sendbuf="62";
+		//trying to unfollow themself
 		if(strcmp(name,g_userlist[userID].name)==0){
 			sendbuf="61";
 		}
 		else{
-			if(havefollowed){
+			if(havefollowed){// remove from follow<int>
 				for(i=0;i<g_userlist.size();i++){
 					if(strcmp(g_userlist[i].name,name)==0){
-						friendID=i;
-						for(vector<User>::iterator iter=g_userlist[userID].following.begin();iter!=g_userlist[userID].following.end();iter++){
-							if(strcmp(iter->name,name)==0){
+						//find the friend's id in following<int>
+						for(auto iter=g_userlist[userID].following.begin();iter!=g_userlist[userID].following.end();iter++){
+							int friendID=*iter;
+							User theFriend=getUser(friendID);
+							if(strcmp(theFriend.name,name)==0){
 								g_userlist[userID].following.erase(iter);
 								break;
 							}

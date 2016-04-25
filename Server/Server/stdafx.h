@@ -8,17 +8,16 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
-#include <vector>
 
-#include <iostream>
-#include <vector>
 #include <string>
 #include <map>
-#include <ctime>
+#include <vector>
+#include <list>
 
+#include <chrono>
+#include <ctime>
 #include <thread>
 #include <mutex>
-#include <chrono>
 
 #include <fstream>
 #include <iostream>

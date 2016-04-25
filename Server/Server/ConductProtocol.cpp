@@ -22,11 +22,15 @@ int unfollow_handler(int userID, SOCKET clntSocket);
 //Message.cpp (also contains override of stream <<(Message) and >>(Message)
 int writeMsgDB();
 map<string,vector<Message>> readMsgDB();
+//User.cpp
+int writeUserDB();
+vector<User> readUserDB();
 
 extern vector<User> g_userlist;
 extern map<string,vector<Message>> g_messages;
 extern mutex g_user_mutex;
 extern mutex g_message_mutex;
+extern mutex g_storage_mutex;
 
 int ready(SOCKET ClientSocket){ //tell the client you are ready for the next instruction
 
@@ -52,17 +56,15 @@ int conduct_protocol(SOCKET ClientSocket, int userID){
 	g_user_mutex.unlock();
 
  // Receive until the peer shuts down the connection
-    int iResult;
-    int iSendResult;
-	
+    int iResult;	
 	int recvbuflen=DEFAULT_BUFLEN;
 
-	g_user_mutex.lock();
-	bool firstTime=(g_userlist.size()<2);
-	g_user_mutex.unlock();
-	if(firstTime){
-		initialize(userID);//creates users Bill and Jim, Jim is following Bill. Bill has a message
-	}
+	//g_user_mutex.lock();
+	//bool firstTime=(g_userlist.size()<2);
+	//g_user_mutex.unlock();
+	//if(firstTime){
+	//	initialize(userID);//creates users Bill and Jim, Jim is following Bill. Bill has a message
+	//}
 
     do {
 		cout<<"waiting for next user command at CondutProtocol"<<endl;
@@ -109,31 +111,10 @@ int conduct_protocol(SOCKET ClientSocket, int userID){
 
 		   readyCP(ClientSocket);
 
-		   std::ofstream ofs("saved.txt");
-
-			//if(g_messages.size()>0){
-			//	
-			//	cout<<"We are going to save a message to a file."<<endl;
-
-			//	auto mIt=g_messages.find(currentUser);//current user's first msg
-			//	Message m1 = mIt->second.at(0);
-			//	ofs << m1; // store the object to file
-			//	ofs.close();
-			//	cout<<"Saved. Check saved.txt"<<endl;
-
-
-			//	std::ifstream ifs("saved.txt");
-
-			//	// read the object back in
-			//	if(ifs >> m1)
-			//	{
-			//		// read was successful therefore m1 is valid
-			//		cout<<"We got the object back!"<<endl;
-			//		std::cout << "message text: "<< m1.content << endl; // print s2 to console
-			//	}
-			//}
-			writeMsgDB();
-			readMsgDB();
+			//writeMsgDB();
+			//map<string, vector<Message>> newMsgDB=readMsgDB();
+			//writeUserDB();
+			//vector<User> newUserDB = readUserDB();
         }
         else if (iResult == 0)
             printf("Connection closing...\n");
@@ -227,14 +208,12 @@ int sendAllPackages(vector<string> messagePkgs, SOCKET ConnectSocket){
 
 		iResult = send( ConnectSocket, sendbuf, (int)strlen(sendbuf), 0 );
 		cout<<"sent message: "<<sendbuf<<endl;
-
 		if (iResult == SOCKET_ERROR) {
 			printf("send failed with error: %d\n", WSAGetLastError());
 			closesocket(ConnectSocket);
 			WSACleanup();
 			return 1;
 		}
-
 		//now listen for the client to say: 00 (waiting for more...)
 		int iRecieve = recv(ConnectSocket, recvbuf, recvbuflen, 0);
 		

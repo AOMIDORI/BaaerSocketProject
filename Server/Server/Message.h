@@ -6,9 +6,9 @@ class Message {
 	int id;
 	string content;
 	double timeStamp;
-	string user;
+	int user;
 
-    Message(string text, string user);
+    Message(string text, int user);
 
 	//for writing and reading to permanent storage
 	// Insertion operator
@@ -22,11 +22,11 @@ class Message {
 
 class User {
 public: 
+	int ID;
 	char *name;
 	int status; // 0: offline,  1: online
 	//vector<Message> messagelist;
-	vector<User> following;
-
+	vector<int> following;
 
 	//for writing and reading to permanent storage
 	// Insertion operator
@@ -34,4 +34,7 @@ public:
 	// Extraction operator
 	friend std::istream& operator>>(std::istream& is, User& s);
 
+	User();
+
+	User getUser(int id);
 };

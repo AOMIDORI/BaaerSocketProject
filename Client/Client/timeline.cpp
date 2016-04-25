@@ -42,23 +42,25 @@ int manageTimelineDialogue(SOCKET ConnectSocket, bool userTimeline){
 		//FORMAT: "01:NumberPackages:PackageNumber:Length:Package"
 		vector<string> tolkens= makeTolkens(recvbuf, ':');
 
+		char get[DEFAULT_BUFLEN];
+
 		string gotMessages = getAllPackages(tolkens,ConnectSocket);
 		//cout<<"Got the messages: "<<gotMessages<<endl;
+		iRecieve = recv(ConnectSocket, get, recvbuflen, 0);//I will work now [T1]
 		
 		//now we have a big long string. how do we separate the messages? The | character
-		char *c = new char[gotMessages.length() + 1];
+		char *c = new char[gotMessages.length() + 1];  
 		strcpy_s(c, strlen(c)+1, gotMessages.c_str());
 		vector<string> vMessages = makeTolkens(c, '|');
 
-
+		//print the messages for the user
 		for(string message: vMessages){
 			cout<<"   "<<to_string(n)<<": "<<message<<endl;
 			n++;
 		}
 		
-		char get[DEFAULT_BUFLEN];
-		ready(ConnectSocket);//ready for ya [A]!
-		iRecieve = recv(ConnectSocket, get, recvbuflen, 0);//are there more msgs?
+		iRecieve = send(ConnectSocket, "T2", 2, 0);//ready for ya [T2]!
+		iRecieve = recv(ConnectSocket, get, recvbuflen, 0);//are there more msgs? [T3]
 		//cout<<"Server, are there any more messages? "<<get[0]<<get[10]<<endl;
 		if(get[0]=='1'&&get[1]=='2'){//there are more messages
 			//ask user: do you want more messages?
@@ -67,11 +69,11 @@ int manageTimelineDialogue(SOCKET ConnectSocket, bool userTimeline){
 				cout<<"     [0] That's enough"<<endl<<"     [1] see more messages"<<endl;
 				int command = read_positive_integer();
 				if(command==0){
-					ready(ConnectSocket);//done. return to main menu [B]
+					ready(ConnectSocket);//done. return to main menu [T4]
 					noCommand=false;
 				}else if(command==1){
 					userWantsMore=true;
-					char* sendcmd = "12"; //says, send me more of my timeline [B]
+					char* sendcmd = "12"; //says, send me more of my timeline [T4]
 					send(ConnectSocket, sendcmd, (int)strlen(sendcmd), 0 ); 
 					noCommand=false;
 				}else{
@@ -86,7 +88,8 @@ int manageTimelineDialogue(SOCKET ConnectSocket, bool userTimeline){
 	}while(userWantsMore);
 
 	char check[DEFAULT_BUFLEN];
-	int iRecieve = send(ConnectSocket, "C", 2, 0);//ready to exit [C]
+	int iRecieve = recv(ConnectSocket, check, recvbuflen, 0);//waiting to exit [T5]
+	iRecieve = send(ConnectSocket, "T5", 2, 0);//ready to exit [T6]
 	iRecieve = recv(ConnectSocket, check, recvbuflen, 0);//[CP] from ConductProtocol;
 
 	if(userTimeline){ //they can choose to delete a message from here
